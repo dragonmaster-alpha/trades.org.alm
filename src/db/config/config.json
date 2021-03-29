@@ -1,0 +1,18 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "master",
+    "database": "alm",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "logging": false
+  },
+  "production": {
+    "username": "postgres",
+    "password": "7kkl2UYtUUI7zjx6sla2YkJckjUyjQcB",
+    "database": "alm",
+    "host": "trades-org-db.ctlfuxmdcjru.us-east-1.rds.amazonaws.com",
+    "dialect": "postgres",
+    "logging": false
+  }
+}

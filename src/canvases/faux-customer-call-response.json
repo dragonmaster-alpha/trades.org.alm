@@ -1,0 +1,110 @@
+{
+  "Comment": "Faux Customer Call Response - Tell the pro we're busy, ask for an email, and tell them we'll call them back.",
+  "StartAt": "1.SMS",
+  "States": {
+    "1.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Sorry - can't voice right now. I'll call you back in a few hours",
+              "Have to call you back",
+              "Let me give you a ring later",
+              "In the middle of something will call you back a little later",
+              "Very loud where I'm at -- will call you in a few hours",
+              "Am on a shift so will have to call back when I'm off",
+              "I'm working so let me call you once I wrap",
+              "Am running errands will call you back",
+              "With kids watching movie let me call you after",
+              "Am on other line",
+              "Have bad reception here will call you later",
+              "Just sat down to eat will call you back"
+            ]
+          }
+        }
+      },
+      "Next": "2.Wait"
+    },
+    "2.Wait": {
+      "Type": "Wait",
+      "Seconds": 8,
+      "Next": "3.SMS"
+    },
+    "3.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Do you have a website? Shoot me your email and I'll send over proj details later",
+              "What's your email so I can send over pics? And do you have a website / yelp / etc?",
+              "I can send over pics / details in a bit. What's your email?",
+              "Let me email you pics / info. What's your email and do you have a website?",
+              "Have a FB / Yelp / website with reviews? And what's your email so I can send you info",
+              "I wrote down project details I can send over. What's your email? You have a website or FB?"
+            ]
+          }
+        }
+      },
+      "Next": "4.CalculateWaitTime"
+    },
+    "4.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 4,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "5.Wait"
+    },
+    "5.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "6.SMS"
+    },
+    "6.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "My project isn't urgent but I'd like to get it scheduled",
+              "Following up -- would love to send over project info",
+              "Do you have time to chat in about half an hour?",
+              "Hi! Just checking in. Can I send you over the details?",
+              "Hi just following up on last message"
+            ]
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}

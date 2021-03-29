@@ -1,0 +1,267 @@
+{
+  "Comment": "Your website is down - direct offer. - Opens with 'your website is down' and then advertises our offerings.'",
+  "StartAt": "1.SMS",
+  "States": {
+    "1.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Hey, want your website fixed?",
+              "Your website isn't working. Want help setting it up?",
+              "Your website is broken. Want it fixed?",
+              "{{website}} is broken. Want it fixed?",
+              "Struggling to find work, I can get {{website}} up and running again",
+              "Want to win more jobs? I can get your website back up",
+              "Looking to win more jobs? You need to get {{website}} fixed",
+              "I can help you get {{website}} working again",
+              "I can help you get your website working again"
+            ]
+          }
+        }
+      },
+      "Next": "2.Wait"
+    },
+    "2.Wait": {
+      "Type": "Wait",
+      "Seconds": 10,
+      "Next": "3.SMS"
+    },
+    "3.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "It's less than an hour of your time and $33 bucks",
+              "Your site can be set up in twenty minutes for the cost of two 12-packs",
+              "{{website}} can be up and running for the cost of two 12-packs",
+              "{{website}} can have a professional website for just $33/month",
+              "I can have {{website}} back online in less than 20 minutes"
+            ]
+          }
+        }
+      },
+      "Next": "4.CalculateWaitTime"
+    },
+    "4.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 1,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "5.Wait"
+    },
+    "5.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "6.SMS"
+    },
+    "6.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Trust drives business. People won't trust you if they can't find you online",
+              "Trust wins jobs. Make it easy for people to find you so they know they can trust you",
+              "When a lead can't reach your website, they'll worry they can't trust you",
+              "Customers want to research you before they buy. You should make it easy for them"
+            ]
+          }
+        }
+      },
+      "Next": "7.CalculateWaitTime"
+    },
+    "7.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 1,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "8.Wait"
+    },
+    "8.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "9.SMS"
+    },
+    "9.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "If now isn't a good time, let me know when you're free",
+              "If you're busy just let me know when is good for you.",
+              "We can hop on a 10 minute call and I can walk you through fixing your site",
+              "Please give me a call when you have a sec"
+            ]
+          }
+        }
+      },
+      "Next": "10.CalculateWaitTime"
+    },
+    "10.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 12,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "11.Wait"
+    },
+    "11.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "12.SMS"
+    },
+    "12.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Or do I have the wrong number?",
+              "Or are you not {{business_name}}?",
+              "Sorry, did I get the wrong number?",
+              "Is this not {{business_name}}?",
+              "Are you not {{website}}?"
+            ]
+          }
+        }
+      },
+      "Next": "13.CalculateWaitTime"
+    },
+    "13.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 18,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "14.Wait"
+    },
+    "14.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "15.SMS"
+    },
+    "15.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Sorry for the disruption. I'll update FB/Google/Yelp that this is a closed business.",
+              "One last try before I update Google/FB/Yelp/etc with your closure.",
+              "Apologies for disturbance. Will update goog/fb/yelp that this is wrong number."
+            ]
+          }
+        }
+      },
+      "Next": "16.Wait"
+    },
+    "16.Wait": {
+      "Type": "Wait",
+      "Seconds": 86400,
+      "Next": "17.UpdateHubspot"
+    },
+    "17.UpdateHubspot": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-update-hubspot",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "object_type": "deal",
+            "properties": {
+              "dealstage": "4800187",
+              "closed_lost_reason": "Unreachable"
+            }
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}

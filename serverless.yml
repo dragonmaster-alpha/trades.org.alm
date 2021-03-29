@@ -1,0 +1,118 @@
+service: trades-org-alm
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs12.x
+  logRetentionInDays: 14
+  timeout: 300
+  deploymentBucket:
+    name: refresh-sls-deployment
+    serverSideEncryption: AES256
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - sns:*
+      Resource: [
+        "arn:aws:sns:us-east-1:817399776222:hubspot-webhook"
+      ]
+    - Effect: "Allow"
+      Action:
+        - states:StartExecution
+        - states:StopExecution
+        - states:DescribeStateMachine
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - logs:CreateLogStream
+      Resource: "arn:aws:dynamodb:*:*:table/mongodb-tokens"
+  environment:
+    NODE_ENV: ${opt:stage, 'development'}
+    TWILIO_ACCOUNT_SID: ${ssm:twilio_account_sid}
+    TWILIO_AUTH_TOKEN: ${ssm:twilio_auth_token}
+    MONGODB_API_KEY: ${ssm:mongodb-realm-trades-org-messaging-api-key}
+    HUBSPOT_API_KEY: ${ssm:hubspot_api_token}
+    HUBSPOT_DEV_DETAILS: ${ssm:hubspot-developer-account-refresh-token}
+
+functions:
+  # Step Lambdas
+  stopAllActiveJourneys:
+    handler: src/handlers/steps.stopAllActiveJourneys
+    name: trades-org-alm-stop-all-active-journeys
+
+  sendSMS:
+    handler: src/handlers/steps.sendSms
+    name: trades-org-alm-send-sms
+
+  updateHubspot:
+    handler: src/handlers/steps.updateHubspot
+    name: trades-org-alm-update-hubspot
+
+  calculateWaitTime:
+    handler: src/handlers/steps.calculateWaitTime
+    name: trades-org-alm-calc-wait-time
+
+  # Webhooks
+  hubspotWebhook:
+    handler: src/handlers/webhooks.hubspotWebhook
+    name: trades-org-alm-hubspot-webhook
+    events:
+      - http:
+          integration: lambda-proxy
+          method: POST
+          path: /webhooks/hubspot
+
+  # SNS
+  handleHubspotEvent:
+    timeout: 300
+    handler: src/handlers/webhooks.handleHubspotEvent
+    name: trades-org-alm-handle-hubspot-event
+    events:
+      - sns: arn:aws:sns:us-east-1:817399776222:hubspot-webhook
+
+  handleSmsStatusPostback:
+    timeout: 300
+    handler: src/handlers/webhooks.handleSmsStatusPostback
+    name: trades-org-alm-handle-sms-status-postback
+    events:
+      - sns: arn:aws:sns:us-east-1:817399776222:trades-org-twilio-sms-status-postback
+
+  handleIncomingSms:
+    timeout: 300
+    handler: src/handlers/webhooks.handleIncomingSms
+    name: trades-org-alm-handle-incoming-sms
+    events:
+      - sns: arn:aws:sns:us-east-1:817399776222:trades-org-twilio-flex-sms-webhook
+
+  handleAnsweredCall:
+    timeout: 300
+    handler: src/handlers/webhooks.handleAnsweredCall
+    name: trades-org-alm-handle-answered-call
+    events:
+      - sns: arn:aws:sns:us-east-1:817399776222:trades-org-twilio-call-answered
+
+  handleIncomingCall:
+    timeout: 300
+    handler: src/handlers/webhooks.handleIncomingCall
+    name: trades-org-alm-handle-incoming-call
+    events:
+      - sns: arn:aws:sns:us-east-1:817399776222:trades-org-twilio-call-incoming
+
+  handleStepFunctionExecutionStateChange:
+    timeout: 300
+    logRetentionInDays: 7
+    handler: src/handlers/webhooks.handleStepFunctionExecutionStateChange
+    name: trades-org-alm-handle-execution-state-change
+
+  # API
+  handleAppSyncInvocation:
+    timeout: 300
+    logRetentionInDays: 1
+    handler: src/handlers/api.handleAppSyncInvocation
+    name: trades-org-appsync-alm-api
+
+plugins:
+  - serverless-offline
+  - serverless-deployment-bucket

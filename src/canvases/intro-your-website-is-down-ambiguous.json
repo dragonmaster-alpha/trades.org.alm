@@ -1,0 +1,235 @@
+{
+  "Comment": "Your website is down - ambiguous. - Opens with 'your website is down' and doesn't advertise our offerings.'",
+  "StartAt": "1.SMS",
+  "States": {
+    "1.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Hey, your website isn't working. Are you still in business?",
+              "Hey, your URL is broken. Did you shut down?",
+              "Is this {{website}}? Your site isn't loading.",
+              "Did y'all go out of business? {{website}} isn't working."
+            ]
+          }
+        }
+      },
+      "Next": "2.CalculateWaitTime"
+    },
+    "2.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 4,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "3.Wait"
+    },
+    "3.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "4.SMS"
+    },
+    "4.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "If now isn't a good time, let me know when you're free",
+              "If you're busy just let me know when is good for you.",
+              "Please hit me up when you have a minute",
+              "Please give me a call when you have a sec"
+            ]
+          }
+        }
+      },
+      "Next": "5.CalculateWaitTime"
+    },
+    "5.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 12,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "6.Wait"
+    },
+    "6.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "7.SMS"
+    },
+    "7.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Or do I have the wrong number?",
+              "Or are you not {{business_name}}?",
+              "Sorry, did I get the wrong number?",
+              "Is this not {{business_name}}?",
+              "Are you not {{website}}?"
+            ]
+          }
+        }
+      },
+      "Next": "8.CalculateWaitTime"
+    },
+    "8.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 18,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "9.Wait"
+    },
+    "9.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "10.SMS"
+    },
+    "10.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Are y'all not taking on new work?",
+              "Are you not doing work anymore?",
+              "Are you not serving {{city}} any more?",
+              "Are you still in {{city}}?"
+            ]
+          }
+        }
+      },
+      "Next": "11.CalculateWaitTime"
+    },
+    "11.CalculateWaitTime": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-calc-wait-time",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "amount": 24,
+            "unit": "hours"
+          }
+        }
+      },
+      "ResultSelector": {
+        "timestamp.$": "$.Payload.timestamp"
+      },
+      "ResultPath": "$.wait",
+      "Next": "12.Wait"
+    },
+    "12.Wait": {
+      "Type": "Wait",
+      "TimestampPath": "$.wait.timestamp",
+      "Next": "13.SMS"
+    },
+    "13.SMS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultPath": "$.result",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-send-sms",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "message": [
+              "Sorry for the disruption. I'll update FB/Google/Yelp that this is a closed business.",
+              "One last try before I update Google/FB/Yelp/etc with your closure.",
+              "Apologies for disturbance. Will update goog/fb/yelp that this is wrong number."
+            ]
+          }
+        }
+      },
+      "Next": "14.Wait"
+    },
+    "14.Wait": {
+      "Type": "Wait",
+      "Seconds": 86400,
+      "Next": "15.UpdateHubspot"
+    },
+    "15.UpdateHubspot": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:817399776222:function:trades-org-alm-update-hubspot",
+        "Payload": {
+          "step.$": "$$.State.Name",
+          "input.$": "$",
+          "body": {
+            "object_type": "deal",
+            "properties": {
+              "dealstage": "4800187",
+              "closed_lost_reason": "Unreachable"
+            }
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}
